@@ -9,12 +9,10 @@ button { font-family:inherit; cursor:pointer; }
 /* ---------- panels ---------- */
 .rpg-panel {
   background:linear-gradient(160deg, rgba(28,24,18,.94), rgba(16,14,10,.94));
-  border:8px solid transparent;
-  border-image: url('assets/ui/panel_frame_9slice.png') 24 fill stretch;
-  border-radius:4px;
+  border:1px solid #6b5a32; outline:1px solid #241d10;
   box-shadow:0 0 0 1px #000, 0 6px 24px rgba(0,0,0,.6), inset 0 0 32px rgba(0,0,0,.5);
+  border-radius:4px;
 }
-.rpg-panel.fallback { border:1px solid #6b5a32; outline:1px solid #241d10; }
 .slot-head { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#a8935c; margin:4px 0 6px; border-bottom:1px solid #3d3320; padding-bottom:3px; }
 
 /* ---------- title ---------- */
@@ -81,13 +79,13 @@ button { font-family:inherit; cursor:pointer; }
 .name-row label { color:#a8935c; font-size:14px; }
 #ng-name { background:#171410; border:1px solid #6b5a32; color:#e8d5a0; padding:7px 10px; font-family:inherit; font-size:16px; width:200px; text-align:center; border-radius:3px; outline:none; }
 #ng-name:focus { border-color:#c9a84c; box-shadow:0 0 10px #c9a84c44; }
-.menu-btn { display:block; margin:10px auto 0; width:260px; padding:12px 0; background:linear-gradient(#3a3222,#241f14) center/cover no-repeat, url('assets/ui/button_normal.png') center/100% 100% no-repeat; border:1px solid #6b5a32; color:#e0cfa0; font-size:16px; letter-spacing:3px; border-radius:3px; transition:all .15s; }
-.menu-btn:hover:not(:disabled), .menu-btn:focus-visible { background:linear-gradient(#4d4228,#2e2718) center/cover no-repeat, url('assets/ui/button_hover.png') center/100% 100% no-repeat; color:#ffe9b0; box-shadow:0 0 14px #c9a84c44; border-color:#c9a84c; }
+.menu-btn { display:block; margin:10px auto 0; width:260px; padding:12px 0; background:linear-gradient(#3a3222,#241f14); border:1px solid #6b5a32; color:#e0cfa0; font-size:16px; letter-spacing:3px; border-radius:3px; transition:all .15s; }
+.menu-btn:hover:not(:disabled), .menu-btn:focus-visible { background:linear-gradient(#4d4228,#2e2718); color:#ffe9b0; box-shadow:0 0 14px #c9a84c44; }
 .menu-btn:focus-visible { outline:2px solid #c9a84c; outline-offset:2px; }
 .menu-btn:disabled { opacity:.35; cursor:default; }
 .menu-btn.small { width:auto; padding:7px 18px; font-size:13px; letter-spacing:1px; }
-.menu-btn.danger { border-color:#7a3030; color:#e0a0a0; background-image: url('assets/ui/button_danger.png'); }
-.menu-btn.danger:hover:not(:disabled) { box-shadow:0 0 14px #a0303044; background-image: url('assets/ui/button_danger.png'); }
+.menu-btn.danger { border-color:#7a3030; color:#e0a0a0; }
+.menu-btn.danger:hover:not(:disabled) { box-shadow:0 0 14px #a0303044; }
 #title-settings h3 { color:#c9a84c; letter-spacing:3px; margin-bottom:10px; }
 
 /* ---------- slot modals ---------- */
