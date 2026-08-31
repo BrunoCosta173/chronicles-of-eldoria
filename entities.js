@@ -160,14 +160,31 @@ function setHPBar(bar, pct){
 const FX = {
   particles:[], projectiles:[],
   scene:null,
-  pGeo:null, pMats:{},
+  pGeo:null, pMats:{}, vfxTex:{},
   init(scene){
     this.scene=scene;
     this.pGeo=new THREE.PlaneGeometry(0.3,0.3);
+    // Load hand-painted VFX sprites if present in assets/fx/
+    const loader=new THREE.TextureLoader();
+    const vfxMap={hit:'hit_spark',crit:'crit_star',heal:'heal_burst',poison:'poison_bubbles',fire:'fire_explosion',ice:'ice_frost'};
+    for(const k in vfxMap){
+      const tex=loader.load('assets/fx/'+vfxMap[k]+'.png', (t)=>{ t.minFilter=THREE.LinearFilter; t.magFilter=THREE.LinearFilter; });
+      tex.minFilter=THREE.LinearFilter; tex.magFilter=THREE.LinearFilter;
+      this.vfxTex[k]=tex;
+    }
   },
   _pmat(color){
     if(!this.pMats[color]) this.pMats[color]=new THREE.MeshBasicMaterial({color, transparent:true, depthWrite:false});
     return this.pMats[color];
+  },
+  _vfxMat(kind){
+    const tex=this.vfxTex[kind];
+    if(!tex) return null;
+    const key='vfx_'+kind;
+    if(!this.pMats[key]){
+      this.pMats[key]=new THREE.MeshBasicMaterial({map:tex, transparent:true, depthWrite:false});
+    }
+    return this.pMats[key];
   },
   burst(x,y,z,color,n,spread,up,life){
     if(this.particles.length>160) return;
@@ -180,11 +197,25 @@ const FX = {
       this.particles.push({m, vx:(Math.random()-0.5)*spread, vy:Math.random()*up+1, vz:(Math.random()-0.5)*spread, life:(life||0.7)*(0.6+Math.random()*0.8), max:life||0.7});
     }
   },
-  hitFX(x,y,z,color){ this.burst(x,y,z,color||0xffdd88,8,5,4,0.45); },
-  critFX(x,y,z){ this.burst(x,y,z,0xffd75e,14,6,5,0.6); },
+  _burstVFX(x,y,z,kind,n,spread,up,life,scale){
+    const mat=this._vfxMat(kind);
+    if(!mat) return false;
+    if(this.particles.length>160) return true;
+    for(let i=0;i<n;i++){
+      let m;
+      if(this.particles.length<220){ m=new THREE.Mesh(this.pGeo, mat); this.scene.add(m); }
+      else { const old=this.particles.shift(); m=old.m; m.material=mat; }
+      m.visible=true; m.position.set(x,y,z);
+      m.scale.setScalar((scale||0.7)+Math.random()*0.6);
+      this.particles.push({m, vx:(Math.random()-0.5)*spread, vy:Math.random()*up+1, vz:(Math.random()-0.5)*spread, life:(life||0.7)*(0.6+Math.random()*0.8), max:life||0.7});
+    }
+    return true;
+  },
+  hitFX(x,y,z,color){ if(this._burstVFX(x,y,z,'hit',8,5,4,0.45,0.7)) return; this.burst(x,y,z,color||0xffdd88,8,5,4,0.45); },
+  critFX(x,y,z){ if(this._burstVFX(x,y,z,'crit',14,6,5,0.6,0.9)) return; this.burst(x,y,z,0xffd75e,14,6,5,0.6); },
   deathFX(x,y,z,color){ this.burst(x,y,z,color||0x888888,16,4,3,0.8); this.burst(x,y,z,0xffffff,6,3,4,0.5); },
-  levelFX(x,y,z){ this.burst(x,y,z,0xffd75e,30,3,6,1.2); this.burst(x,y+1,z,0xffffff,12,2,5,1); },
-  magicFX(x,y,z,color){ this.burst(x,y,z,color,10,4,4,0.5); },
+  levelFX(x,y,z){ if(this._burstVFX(x,y,z,'crit',30,3,6,1.2,1.0)) { this.burst(x,y+1,z,0xffffff,12,2,5,1); return; } this.burst(x,y,z,0xffd75e,30,3,6,1.2); this.burst(x,y+1,z,0xffffff,12,2,5,1); },
+  magicFX(x,y,z,color){ if(color===0x7fd63a || color===0x7fd6ff){ if(this._burstVFX(x,y,z,'poison',6,3,4,0.6,0.8)) return; } this.burst(x,y,z,color,10,4,4,0.5); },
   update(dt, camera){
     for(let i=this.particles.length-1;i>=0;i--){
       const p=this.particles[i];
