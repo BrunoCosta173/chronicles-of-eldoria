@@ -875,6 +875,8 @@ const UI = {
     const npc=NPCS[npcId];
     $('dialogue').classList.remove('hidden');
     $('dlg-name').textContent=npc.name.toUpperCase()+' — '+npc.title;
+    const portrait=$('dlg-portrait');
+    if(portrait){ portrait.src='assets/npc/'+npcId+'.png'; portrait.alt=npc.name; portrait.style.display='block'; }
     const opts=[];
     const line=npc.lines[0];
     let text=line;

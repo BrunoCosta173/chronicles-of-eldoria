@@ -364,8 +364,11 @@ button { font-family:inherit; cursor:pointer; }
 .set-row input[type=checkbox]{ accent-color:#c9a84c; transform:scale(1.2); cursor:pointer; }
 
 /* dialogue */
-#dialogue { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); width:600px; max-width:92vw; z-index:75; pointer-events:auto; }
+#dialogue { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); width:640px; max-width:92vw; z-index:75; pointer-events:auto; }
 .dlg-panel { padding:16px 20px; }
+.dlg-header { display:flex; gap:14px; align-items:flex-start; }
+.dlg-portrait { width:80px; height:80px; border:1px solid #6b5a32; border-radius:4px; background:#120f0a; object-fit:cover; image-rendering:pixelated; flex-shrink:0; box-shadow:0 2px 8px #0008; }
+.dlg-header-text { flex:1; }
 #dlg-name { color:#ffd75e; font-size:17px; letter-spacing:2px; margin-bottom:6px; }
 #dlg-text { font-size:14px; line-height:1.7; color:#e0d5ae; min-height:40px; }
 #dlg-options { margin-top:12px; display:flex; flex-direction:column; gap:6px; }
