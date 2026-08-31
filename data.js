@@ -106,7 +106,8 @@ I('swamp_herb',   { name:'Bogwort',       icon:'🌿', type:'material', rarity:'
 I('iron_ore',     { name:'Iron Ore',      icon:'⛏️', type:'material', rarity:'common', price:15, stack:true, desc:'Borin pays well for this.' });
 I('shadow_dust',  { name:'Shadow Dust',   icon:'🌑', type:'material', rarity:'uncommon', price:40, stack:true, desc:'Elara buys it by the dram.' });
 
-for (const k in ITEMS){ const it = ITEMS[k]; if(!it.desc) it.desc = ''; if(!it.stats) it.stats = {}; if(!it.lvl) it.lvl = 1; }
+for (const k in ITEMS){ const it = ITEMS[k]; if(!it.desc) it.desc = ''; if(!it.stats) it.stats = {}; if(!it.lvl) it.lvl = 1; it.sprite='assets/icons/'+k+'.png'; }
+function spriteIcon(id, cls){ const sp=ITEMS[id]?.sprite; if(sp) return '<img class="item-sprite'+(cls?' '+cls:'')+'" src="'+sp+'" alt="'+esc(ITEMS[id].name)+'" loading="lazy" onerror="this.style.display=\'none\';this.nextSibling&&this.nextSibling.classList.remove(\'hidden\')"> <span class="hidden">'+esc(ITEMS[id].icon)+'</span>'; return esc(ITEMS[id]?.icon||''); }
 function sellPrice(id){ return Math.max(1, Math.round((ITEMS[id].price||10) * 0.4)); }
 
 /* ---------------- VOCATIONS / CLASSES ---------------- */

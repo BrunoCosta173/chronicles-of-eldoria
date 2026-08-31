@@ -251,6 +251,10 @@ button { font-family:inherit; cursor:pointer; }
 .inv-cell:hover { border-color:#c9a84c; }
 .inv-cell.selected { border-color:#ffd75e; box-shadow:0 0 8px #c9a84c66; }
 .inv-cell .qty { position:absolute; bottom:2px; right:4px; font-size:11px; color:#fff; text-shadow:0 1px 2px #000; }
+.item-sprite { width:48px; height:48px; image-rendering:pixelated; image-rendering:crisp-edges; object-fit:contain; filter:drop-shadow(0 1px 2px #000); }
+.shop-icon { width:28px; height:28px; }
+.drag-icon { width:32px; height:32px; }
+.tt-name .item-sprite { width:20px; height:20px; vertical-align:middle; margin-right:4px; }
 .inv-cell.drag-over { border-color:#ffd75e; box-shadow:0 0 14px #c9a84c88, inset 0 0 14px #c9a84c33; }
 .inv-cell.empty.drag-over { border-color:#5fb06a; box-shadow:0 0 14px #3f8f3f88, inset 0 0 14px #3f8f3f33; }
 

@@ -15,7 +15,7 @@ const Drag = {
 
   begin(e, src, item, split){
     this.src=src; this.item={id:item.id, qty:item.qty}; this.qty=item.qty; this.split=!!split;
-    this.el=el('div','drag-ghost', ITEMS[item.id].icon+(item.qty>1?'<span class="qty">'+item.qty+'</span>':''));
+    this.el=el('div','drag-ghost', (typeof spriteIcon!=='undefined'?spriteIcon(item.id,'drag-icon'):esc(ITEMS[item.id].icon))+(item.qty>1?'<span class="qty">'+item.qty+'</span>':''));
     document.body.appendChild(this.el);
     e.preventDefault();
   },
@@ -598,7 +598,7 @@ const UI = {
   tooltipItem(id, compareSlot){
     const it=ITEMS[id];
     const rc=RARITY_CLASS[it.rarity];
-    let h='<div class="tt-name '+rc+'">'+it.icon+' '+esc(it.name)+'</div>';
+    let h='<div class="tt-name '+rc+'">'+(typeof spriteIcon!=='undefined'?spriteIcon(id):esc(it.icon))+' '+esc(it.name)+'</div>';
     h+='<div class="tt-rar '+rc+'">'+RARITY[it.rarity]+(it.lvl>1?' • Level '+it.lvl:'')+'</div>';
     if(it.dmg) h+='<div class="tt-stat">Damage '+it.dmg[0]+'–'+it.dmg[1]+(it.range?' • Range '+it.range:'')+'</div>';
     const st=it.stats||{};
@@ -660,7 +660,7 @@ const UI = {
         count++;
         c.classList.add('r-'+it.rarity);
         if(UI.selInv===i) c.classList.add('selected');
-        c.innerHTML=it.icon+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
+        c.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(s.id):esc(it.icon))+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
         c.addEventListener('click', ()=>{ UI.selInv=i; UI.refreshInventory(); Audio.play('click'); });
         c.addEventListener('dblclick', ()=>{ P.useItem(i); UI.selInv=-1; UI.refreshInventory(); });
         UI.attachDrag(c,{kind:'inv',idx:i},s);
@@ -684,7 +684,7 @@ const UI = {
       cell.classList.remove('filled','r-common','r-uncommon','r-rare','r-epic','r-legendary');
       if(id){
         const it=ITEMS[id];
-        cell.innerHTML=it.icon;
+        cell.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(id):esc(it.icon));
         cell.classList.add('filled','r-'+it.rarity);
         UI.attachDrag(cell,{kind:'equip',idx:cell.dataset.slot},{id, qty:1});
       } else {
@@ -934,7 +934,7 @@ const UI = {
       if(seen.has(id)) continue; seen.add(id);
       const it=ITEMS[id];
       const row=el('div','shop-item');
-      row.innerHTML='<span class="si-ico">'+it.icon+'</span><span class="si-name '+RARITY_CLASS[it.rarity]+'">'+esc(it.name)+'</span><span class="si-price">'+it.price+' g</span>';
+      row.innerHTML='<span class="si-ico">'+(typeof spriteIcon!=='undefined'?spriteIcon(id,'shop-icon'):esc(it.icon))+'</span><span class="si-name '+RARITY_CLASS[it.rarity]+'">'+esc(it.name)+'</span><span class="si-price">'+it.price+' g</span>';
       const b=el('button',null,'Buy');
       b.disabled=G.player.gold<it.price;
       b.addEventListener('click', ()=>Shop.buy(npcId,id));
@@ -951,7 +951,7 @@ const UI = {
       const it=ITEMS[s.id];
       if(it.type==='quest'){ return; }
       const row=el('div','shop-item');
-      row.innerHTML='<span class="si-ico">'+it.icon+'</span><span class="si-name '+RARITY_CLASS[it.rarity]+'">'+esc(it.name)+(s.qty>1?' ×'+s.qty:'')+'</span><span class="si-price">'+sellPrice(s.id)+' g</span>';
+      row.innerHTML='<span class="si-ico">'+(typeof spriteIcon!=='undefined'?spriteIcon(s.id,'shop-icon'):esc(it.icon))+'</span><span class="si-name '+RARITY_CLASS[it.rarity]+'">'+esc(it.name)+(s.qty>1?' ×'+s.qty:'')+'</span><span class="si-price">'+sellPrice(s.id)+' g</span>';
       const b=el('button',null,'Sell');
       b.addEventListener('click', ()=>Shop.sell(i));
       row.appendChild(b);
@@ -978,7 +978,7 @@ const UI = {
         const it=ITEMS[s.id];
         c.classList.add('r-'+it.rarity);
         if(UI.selInv===i) c.classList.add('selected');
-        c.innerHTML=it.icon+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
+        c.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(s.id):esc(it.icon))+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
         UI.attachDrag(c,{kind:'inv',idx:i},s);
       } else c.classList.add('empty');
       c.addEventListener('click', ()=>{ if(s){ UI.selInv=i; UI.refreshDepot(); } });
@@ -995,7 +995,7 @@ const UI = {
         const it=ITEMS[s.id];
         c.classList.add('r-'+it.rarity);
         if(UI._depotSel===i) c.classList.add('selected');
-        c.innerHTML=it.icon+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
+        c.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(s.id):esc(it.icon))+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
         UI.attachDrag(c,{kind:'depot',idx:i},s);
       } else c.classList.add('empty');
       c.addEventListener('click', ()=>{ if(s){ UI._depotSel=i; UI.refreshDepot(); } });
