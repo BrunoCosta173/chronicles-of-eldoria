@@ -8,11 +8,13 @@ assets/*.gltf
 assets/env/
 vendor/*.log
 
-# prints de teste (puppeteer)
-v*.png
+# prints de teste (puppeteer) — não ignorar ícones do jogo (vampire_band etc.)
+/v[0-9]*.png
+/v[0-9]_*.png
 screenshot*.png
 vtest_*.png
 *.tmp
+!assets/icons/*.png
 
 # saves locais exportados (se houver ferramenta de dump)
 eldoria_*.json
