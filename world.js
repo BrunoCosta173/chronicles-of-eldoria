@@ -182,27 +182,8 @@ const GroundAtlas = {
     tex.wrapS=tex.wrapT=THREE.ClampToEdgeWrapping;
     tex.minFilter=THREE.LinearFilter; tex.magFilter=THREE.LinearFilter;
     tex.generateMipmaps=false; tex.anisotropy=4; tex.needsUpdate=true;
-    const entry={ texture:tex, rects, canvasW:cv.width, canvasH:cv.height, canvas:cv, ctx };
-    this.cache[themeId]=entry;
-    // Try to overlay hand-painted tile for base grass (if exists in assets/tiles/)
-    try{
-      const tileName=themeId.charAt(0).toUpperCase()+themeId.slice(1);
-      const img=new Image();
-      img.onload=()=>{
-        try{
-          const grassIdx=GROUND_ORDER.indexOf(TT.GRASS);
-          if(grassIdx<0) return;
-          const col=grassIdx%GA_COLS, row=Math.floor(grassIdx/GA_COLS);
-          // clear and draw tile scaled to cell
-          ctx.clearRect(col*GA_CELL, row*GA_CELL, GA_CELL, GA_CELL);
-          ctx.drawImage(img, col*GA_CELL, row*GA_CELL, GA_CELL, GA_CELL);
-          tex.needsUpdate=true;
-        }catch(e){}
-      };
-      img.onerror=()=>{};
-      img.src='assets/tiles/'+tileName+'.png';
-    }catch(e){}
-    return entry;
+    this.cache[themeId]={ texture:tex, rects, canvasW:cv.width, canvasH:cv.height };
+    return this.cache[themeId];
   },
 };
 
