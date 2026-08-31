@@ -149,6 +149,8 @@ const SKILLS = {
   root:          { name:'Grasp of Roots',  cls:'warden',   icon:'🌱', cost:26, cd:9,  kind:'root',    dur:3.5, range:14, unlock:9,  desc:'The earth holds them fast.' },
   natures_blessing:{ name:'Nature Blessing', cls:'warden', icon:'✨', cost:52, cd:24, kind:'buff', buff:{regen:7,dur:10}, unlock:12, desc:'Regenerate 7 HP/s for 10s.' },
 };
+for (const k in SKILLS){ const s=SKILLS[k]; const map={heavy_strike:'01_heavy_strike',shield_bash:'02_shield_bash',whirlwind:'03_whirlwind',war_cry:'04_war_cry',power_shot:'05_power_shot',multishot:'06_multishot',poison_arrow:'07_poison_arrow',dash_shot:'08_blink_step',fireball:'09_fireball',ice_shard:'10_ice_shard',lightning:'11_lightning',meteor:'12_meteor',heal:'13_mend_wounds',poison_cloud:'14_poison_cloud',root:'15_grasp_of_roots',natures_blessing:'16_nature_blessing'}; if(map[k]) s.sprite='assets/icons/skill/'+map[k]+'.png'; }
+function skillIcon(id, cls){ const sp=SKILLS[id]?.sprite; if(sp) return '<img class="skill-sprite'+(cls?' '+cls:'')+'" src="'+sp+'" alt="'+esc(SKILLS[id].name)+'" loading="lazy" onerror="this.style.display=\'none\'">'; return esc(SKILLS[id]?.icon||''); }
 
 /* ---------------- CREATURES ----------------
    spd in units/s. sight in units. atkRange units. atkCd seconds.

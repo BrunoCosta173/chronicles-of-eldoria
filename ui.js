@@ -432,14 +432,14 @@ const UI = {
     document.querySelectorAll('.hb-slot').forEach(b=>{
       const n=+b.dataset.slot;
       const icon=b.querySelector('.hb-icon'), name=b.querySelector('.hb-name');
-      if(n===6){ icon.innerHTML='🧪'; name.textContent='Potion'; b.classList.remove('disabled'); b.title='Healing Potion'; return; }
+      if(n===6){ const pot=ITEMS['healing_potion']||ITEMS['minor_potion']; icon.innerHTML=(typeof spriteIcon!=='undefined'&&pot?spriteIcon(pot.id||'healing_potion'): '🧪'); name.textContent='Potion'; b.classList.remove('disabled'); b.title='Healing Potion'; return; }
       if(n===5){
-        if(food){ icon.innerHTML=food.icon; name.textContent=food.name; b.classList.remove('disabled'); b.title='Eat '+food.name; }
+        if(food){ icon.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(food.id):esc(food.icon)); name.textContent=food.name; b.classList.remove('disabled'); b.title='Eat '+food.name; }
         else { icon.innerHTML='🍖'; name.textContent='Eat'; b.classList.add('disabled'); b.title='No food'; }
         return;
       }
       const sid=G.hotbarSlots[n-1];
-      if(sid){ const sk=SKILLS[sid]; icon.innerHTML=sk.icon; name.textContent=sk.name; const locked=sk.unlock&&P.level<sk.unlock; b.classList.toggle('disabled',locked); b.title=(locked?'Unlocks at level '+sk.unlock+' — ':'')+sk.name+' — '+sk.cost+' MP — '+sk.cd+'s — '+sk.desc; }
+      if(sid){ const sk=SKILLS[sid]; icon.innerHTML=(typeof skillIcon!=='undefined'&&sk.sprite?skillIcon(sid):esc(sk.icon)); name.textContent=sk.name; const locked=sk.unlock&&P.level<sk.unlock; b.classList.toggle('disabled',locked); b.title=(locked?'Unlocks at level '+sk.unlock+' — ':'')+sk.name+' — '+sk.cost+' MP — '+sk.cd+'s — '+sk.desc; }
       else { icon.innerHTML=''; name.textContent=''; b.classList.add('disabled'); b.title=''; }
     });
   },
@@ -796,7 +796,8 @@ const UI = {
       const locked=has && sk.unlock && P.level<sk.unlock;
       const row=el('div','skill-row'+(has&&!locked?'':' locked'));
       const meta = (has?(locked?'Unlocks at lv '+sk.unlock:sk.cost+' MP<br>'+sk.cd+'s CD'):CLASSES[sk.cls].name);
-      row.innerHTML='<div class="skill-ico">'+sk.icon+'</div><div class="skill-info"><div class="skill-name">'+esc(sk.name)+(has&&!locked?'':' <span style="font-size:10px;color:#9a8a5e">'+(locked?'(Locked)':CLASSES[sk.cls].name)+'</span>')+'</div><div class="skill-desc">'+esc(sk.desc)+'</div></div><div class="skill-meta">'+meta+'</div>';
+      const ico=(typeof skillIcon!=='undefined'&&sk.sprite?skillIcon(id):esc(sk.icon));
+      row.innerHTML='<div class="skill-ico">'+ico+'</div><div class="skill-info"><div class="skill-name">'+esc(sk.name)+(has&&!locked?'':' <span style="font-size:10px;color:#9a8a5e">'+(locked?'(Locked)':CLASSES[sk.cls].name)+'</span>')+'</div><div class="skill-desc">'+esc(sk.desc)+'</div></div><div class="skill-meta">'+meta+'</div>';
       list.appendChild(row);
     }
   },
