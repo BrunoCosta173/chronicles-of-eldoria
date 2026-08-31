@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chronicles of Eldoria</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container"></div>
+
+<!-- ============ LOADING SCREEN ============ -->
+<div id="loading-screen">
+  <div class="load-spinner">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+</div>
+
+<!-- ============ TITLE SCREEN ============ -->
+<div id="title-screen" class="overlay">
+  <div class="title-top">
+    <div class="title-crest">&#9876;</div>
+    <h1 class="game-title">CHRONICLES OF ELDORIA</h1>
+    <div class="game-subtitle">A Single-Player RPG of Adventure</div>
+  </div>
+  <div class="title-bar">
+    <div id="title-menu" class="rpg-panel">
+      <div id="title-loading">LOADING ASSETS&hellip;</div>
+      <button id="btn-new" class="menu-btn" disabled>NEW GAME</button>
+      <button id="btn-load" class="menu-btn" disabled>LOAD GAME</button>
+      <button id="btn-settings-title" class="menu-btn">SETTINGS</button>
+    </div>
+    <div id="title-settings" class="rpg-panel hidden">
+      <h3>Settings</h3>
+      <label class="set-row"><span>Master volume</span><input id="set-vol" type="range" min="0" max="100" value="70"></label>
+      <label class="set-row"><span>Shadows</span><input id="set-shadows" type="checkbox" checked></label>
+      <label class="set-row"><span>Damage numbers</span><input id="set-dmg" type="checkbox" checked></label>
+      <label class="set-row"><span>Enemy HP bars</span><input id="set-bars" type="checkbox" checked></label>
+      <button id="btn-settings-back" class="menu-btn small">BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ NEW GAME MODAL ============ -->
+<div id="newgame-modal" class="overlay hidden">
+  <div class="modal-box rpg-panel">
+    <h2 class="modal-title">Create Your Hero</h2>
+    <div class="name-row">
+      <label for="ng-name">Hero name</label>
+      <input id="ng-name" type="text" maxlength="16" value="Aldwin" spellcheck="false">
+    </div>
+    <div class="slot-head">Choose a slot</div>
+    <div id="ng-slots" class="slot-cards"></div>
+    <div id="ng-full-msg" class="full-msg hidden">All slots are full — delete a save below to create a new hero.</div>
+    <div class="modal-actions">
+      <button id="ng-create" class="menu-btn">CREATE</button>
+      <button id="ng-cancel" class="menu-btn small">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LOAD GAME MODAL ============ -->
+<div id="load-modal" class="overlay hidden">
+  <div class="modal-box rpg-panel">
+    <h2 class="modal-title">Load Game</h2>
+    <div id="load-slots" class="slot-cards"></div>
+    <div class="modal-actions">
+      <button id="load-cancel" class="menu-btn small">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HUD ============ -->
+<div id="hud" class="hidden">
+  <div id="player-frame" class="rpg-panel">
+    <div class="pf-top">
+      <div id="pf-class-icon">&#10013;</div>
+      <div class="pf-names">
+        <div id="pf-name">Hero</div>
+        <div id="pf-class">Adventurer</div>
+      </div>
+      <div id="pf-level">Lv. 1</div>
+    </div>
+    <div class="bar-row"><span class="bar-tag">HP</span><div class="bar hp"><div id="hp-fill" class="fill"></div><div id="hp-text" class="bar-text">100/100</div></div></div>
+    <div class="bar-row"><span class="bar-tag">MP</span><div class="bar mp"><div id="mp-fill" class="fill"></div><div id="mp-text" class="bar-text">30/30</div></div></div>
+    <div class="bar-row"><span class="bar-tag">ST</span><div class="bar st"><div id="st-fill" class="fill"></div><div id="st-text" class="bar-text">100/100</div></div></div>
+    <div class="bar-row xp-row"><span class="bar-tag">XP</span><div class="bar xp"><div id="xp-fill" class="fill"></div><div id="xp-text" class="bar-text">0%</div></div></div>
+    <div id="pf-buffs"></div>
+  </div>
+
+  <div id="top-right">
+    <div id="minimap-box" class="rpg-panel">
+      <div id="zone-name">Asterfall</div>
+      <canvas id="minimap" width="176" height="176"></canvas>
+      <div id="clock">Day</div>
+    </div>
+    <div id="quest-tracker" class="rpg-panel"><div class="qt-title">Quests</div><div id="qt-list"></div></div>
+  </div>
+
+  <div id="target-frame" class="rpg-panel hidden">
+    <div id="target-name">Target</div>
+    <div class="bar hp"><div id="target-fill" class="fill"></div><div id="target-text" class="bar-text"></div></div>
+  </div>
+
+  <div id="boss-bar-box" class="hidden">
+    <div id="boss-name">Boss</div>
+    <div class="bar boss"><div id="boss-fill" class="fill"></div><div id="boss-text" class="bar-text"></div></div>
+  </div>
+
+  <div id="hotbar">
+    <button class="hb-slot" data-slot="1"><span class="hb-key">1</span><span class="hb-icon"></span><span class="hb-name"></span><div class="hb-cd"></div></button>
+    <button class="hb-slot" data-slot="2"><span class="hb-key">2</span><span class="hb-icon"></span><span class="hb-name"></span><div class="hb-cd"></div></button>
+    <button class="hb-slot" data-slot="3"><span class="hb-key">3</span><span class="hb-icon"></span><span class="hb-name"></span><div class="hb-cd"></div></button>
+    <button class="hb-slot" data-slot="4"><span class="hb-key">4</span><span class="hb-icon"></span><span class="hb-name"></span><div class="hb-cd"></div></button>
+    <button class="hb-slot" data-slot="5"><span class="hb-key">5</span><span class="hb-icon">&#127830;</span><span class="hb-name">Eat</span><div class="hb-cd"></div></button>
+    <button class="hb-slot" data-slot="6"><span class="hb-key">6</span><span class="hb-icon">&#129658;</span><span class="hb-name">Potion</span><div class="hb-cd"></div></button>
+  </div>
+
+  <div id="gold-box" class="rpg-panel"><span class="gold-icon">&#129689;</span><span id="gold-text">0</span></div>
+  <div id="toasts"></div>
+  <div id="fx-layer"></div>
+  <div id="name-layer"></div>
+</div>
+
+<!-- ============ ZONE BANNER ============ -->
+<div id="zone-banner" class="hidden"><div id="zone-banner-sub">Entering</div><div id="zone-banner-main">Region</div></div>
+
+<!-- ============ TUTORIAL ============ -->
+<div id="tutorial-box" class="hidden"><span id="tutorial-text"></span></div>
+
+<!-- ============ LEVEL UP ============ -->
+<div id="levelup-banner" class="hidden">
+  <div class="lu-title">LEVEL UP!</div>
+  <div id="lu-text" class="lu-text"></div>
+</div>
+
+<!-- ============ PANELS ============ -->
+<div id="panel-inventory" class="panel rpg-panel hidden" data-title="Inventory">
+  <div class="panel-body inv-body">
+    <div class="inv-left">
+      <div class="inv-card">
+        <div class="inv-card-head">Equipment</div>
+        <div id="equip-grid" class="equip-grid">
+          <div class="eq-cell eq-helmet" data-slot="helmet"><span class="eq-ghost">&#128737;</span></div>
+          <div class="eq-cell eq-amulet" data-slot="amulet"><span class="eq-ghost">&#128279;</span></div>
+          <div class="eq-cell eq-weapon" data-slot="weapon"><span class="eq-ghost">&#128481;</span></div>
+          <div class="eq-cell eq-armor" data-slot="armor"><span class="eq-ghost">&#129529;</span></div>
+          <div class="eq-cell eq-shield" data-slot="shield"><span class="eq-ghost">&#128737;</span></div>
+          <div class="eq-cell eq-legs" data-slot="legs"><span class="eq-ghost">&#128082;</span></div>
+          <div class="eq-cell eq-ring" data-slot="ring"><span class="eq-ghost">&#128141;</span></div>
+          <div class="eq-cell eq-boots" data-slot="boots"><span class="eq-ghost">&#128094;</span></div>
+        </div>
+      </div>
+      <div class="inv-card stats-card">
+        <div class="inv-card-head">Hero Stats</div>
+        <div id="char-stats-mini" class="char-stats-mini"></div>
+      </div>
+    </div>
+    <div class="inv-right">
+      <div class="inv-card">
+        <div class="inv-card-head backpack-head">
+          <span>Backpack <span id="inv-count" class="inv-count"></span></span>
+          <button id="btn-sort" class="menu-btn small sort-btn" title="Sort by type & rarity">Sort</button>
+        </div>
+        <div id="inv-grid" class="inv-grid"></div>
+        <div class="inv-capacity"><div class="inv-cap-track"><div id="inv-cap-bar" class="inv-cap-bar"></div></div><span id="inv-cap-text"></span></div>
+        <div class="inv-actions">
+          <button id="btn-use" class="menu-btn small">Use / Equip</button>
+          <button id="btn-drop" class="menu-btn small danger">Drop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="drop-zone" class="drop-zone hidden">Drop Item</div>
+</div>
+
+<div id="split-modal" class="overlay hidden">
+  <div class="confirm-box">
+    <div class="modal-title" style="font-size:16px;margin-bottom:12px">Split Items</div>
+    <div id="split-amount" class="split-amount">1</div>
+    <input id="split-range" type="range" min="1" max="16" value="1">
+    <div class="modal-actions">
+      <button id="split-ok" class="menu-btn small">Split</button>
+      <button id="split-cancel" class="menu-btn small">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="panel-character" class="panel rpg-panel hidden" data-title="Character">
+  <div class="panel-body char-body">
+    <div class="char-col">
+      <div id="char-class-name" class="char-class">Adventurer</div>
+      <div id="char-level" class="char-level">Level 1</div>
+      <div class="char-xpbar"><div class="bar xp"><div id="char-xp-fill" class="fill"></div><div id="char-xp-text" class="bar-text"></div></div></div>
+      <div id="char-attrs" class="char-attrs"></div>
+      <div id="attr-points-note" class="attr-note"></div>
+      <div class="alloc-row">
+        <button class="alloc-btn" data-attr="str">+ STR</button>
+        <button class="alloc-btn" data-attr="dex">+ DEX</button>
+        <button class="alloc-btn" data-attr="int">+ INT</button>
+        <button class="alloc-btn" data-attr="vit">+ VIT</button>
+      </div>
+    </div>
+    <div class="char-col">
+      <div id="char-derived" class="char-derived"></div>
+    </div>
+  </div>
+</div>
+
+<div id="panel-skills" class="panel rpg-panel hidden" data-title="Skills">
+  <div class="panel-body"><div id="skills-list" class="skills-list"></div></div>
+</div>
+
+<div id="panel-quests" class="panel rpg-panel hidden" data-title="Quest Log">
+  <div class="panel-body"><div id="quests-list" class="quests-list"></div></div>
+</div>
+
+<div id="panel-map" class="panel rpg-panel hidden" data-title="World Map">
+  <div class="panel-body"><canvas id="world-map" width="640" height="480"></canvas><div id="map-legend"></div></div>
+</div>
+
+<div id="panel-menu" class="panel rpg-panel hidden" data-title="Menu" role="dialog" aria-label="Game menu">
+  <div class="panel-body menu-body">
+    <div id="menu-home" class="menu-view">
+      <button id="btn-save-now" class="menu-btn">Save Game</button>
+      <button id="btn-open-settings" class="menu-btn">Settings</button>
+      <button id="btn-return-title" class="menu-btn danger">Return to Title</button>
+      <div id="menu-save-meta" class="menu-save-meta"></div>
+    </div>
+    <div id="menu-settings" class="menu-view hidden">
+      <h3 class="menu-sub-title">Settings</h3>
+      <label class="set-row"><span>Master volume</span><input class="set-vol-x" type="range" min="0" max="100"></label>
+      <label class="set-row"><span>Shadows</span><input class="set-shadows-x" type="checkbox"></label>
+      <label class="set-row"><span>Damage numbers</span><input class="set-dmg-x" type="checkbox"></label>
+      <label class="set-row"><span>Enemy HP bars</span><input class="set-bars-x" type="checkbox"></label>
+      <button id="btn-menu-settings-back" class="menu-btn small">Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DIALOGUE ============ -->
+<div id="dialogue" class="hidden">
+  <div class="dlg-panel rpg-panel">
+    <div id="dlg-name">NPC</div>
+    <div id="dlg-text">...</div>
+    <div id="dlg-options"></div>
+  </div>
+</div>
+
+<!-- ============ SHOP ============ -->
+<div id="shop" class="hidden">
+  <div class="shop-panel rpg-panel">
+    <div id="shop-title">Shop</div>
+    <div id="shop-gold">Gold: 0</div>
+    <div class="shop-cols">
+      <div class="shop-col">
+        <div class="slot-head">For Sale</div>
+        <div id="shop-buy-list" class="shop-list"></div>
+      </div>
+      <div class="shop-col">
+        <div class="slot-head">Your Goods</div>
+        <div id="shop-sell-list" class="shop-list"></div>
+      </div>
+    </div>
+    <button id="shop-close" class="menu-btn small">Leave</button>
+  </div>
+</div>
+
+<!-- ============ DEPOT ============ -->
+<div id="depot" class="hidden">
+  <div class="depot-panel rpg-panel">
+    <div id="depot-title">Bank of Asterfall — Vault</div>
+    <div class="slot-head">Your Backpack (click to select)</div>
+    <div id="depot-backpack" class="inv-grid" style="grid-template-columns:repeat(8,42px);grid-auto-rows:42px;margin-bottom:8px"></div>
+    <div class="slot-head">Your Vault</div>
+    <div id="depot-grid" class="inv-grid"></div>
+    <div class="inv-actions">
+      <button id="btn-deposit" class="menu-btn small">Deposit</button>
+      <button id="btn-withdraw" class="menu-btn small">Withdraw</button>
+      <button id="depot-close" class="menu-btn small">Leave</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VOCATION ============ -->
+<div id="vocation-modal" class="overlay hidden">
+  <div class="voc-box">
+    <h2>Choose Your Path</h2>
+    <div class="voc-sub">Brother Aldric awaits your decision. This cannot be undone.</div>
+    <div id="voc-cards" class="voc-cards"></div>
+  </div>
+</div>
+
+<!-- ============ DEATH ============ -->
+<div id="death-screen" class="overlay hidden">
+  <div class="death-box">
+    <h1>YOU DIED</h1>
+    <div id="death-desc">The mists of Eldoria close in around you...</div>
+    <button id="btn-respawn" class="menu-btn">Return to Asterfall</button>
+  </div>
+</div>
+
+<!-- ============ VICTORY ============ -->
+<div id="victory-screen" class="overlay hidden">
+  <div class="death-box">
+    <h1 class="vic">THE DRAGON FALLS</h1>
+    <div id="vic-desc">Eldoria is safe. For now.</div>
+    <button id="btn-vic-continue" class="menu-btn">Continue Playing</button>
+  </div>
+</div>
+
+<div id="tooltip" class="hidden"></div>
+<div id="confirm-modal" class="overlay hidden">
+  <div class="confirm-box">
+    <div id="confirm-text"></div>
+    <button id="confirm-yes" class="menu-btn small">Yes</button>
+    <button id="confirm-no" class="menu-btn small">No</button>
+  </div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/GLTFLoader.js"></script>
+<script src="vendor/SkeletonUtils.js"></script>
+<script src="data.js"></script>
+<script src="assets.js"></script>
+<script src="world.js"></script>
+<script src="entities.js"></script>
+<script src="systems.js"></script>
+<script src="ui.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

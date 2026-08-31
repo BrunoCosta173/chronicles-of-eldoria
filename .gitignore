@@ -1,0 +1,36 @@
+# deps
+node_modules/
+package-lock.json
+
+# assets pesados (baixados via fetch-*.js — não commitar se >100MB)
+assets/*.glb
+assets/*.gltf
+assets/env/
+vendor/*.log
+
+# prints de teste (puppeteer)
+v*.png
+screenshot*.png
+vtest_*.png
+*.tmp
+
+# saves locais exportados (se houver ferramenta de dump)
+eldoria_*.json
+*.save
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# temp opencode
+.tmp/
+.opencode-tmp/
