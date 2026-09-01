@@ -109,7 +109,7 @@ const Drag = {
 };
 
 const UI = {
-  ftPool:[], labels:[], selInv:-1, selDepot:-1, shopSellSel:-1,
+  ftPool:[], labels:[],
   modalNames:['panel-inventory','panel-character','panel-skills','panel-quests','panel-map','panel-menu'],
 
   init(){
@@ -159,8 +159,7 @@ const UI = {
       document.querySelector('.set-bars-x').addEventListener('change', e=>{ Settings.bars=e.target.checked; syncSettings(); });
     }
     // inventory buttons
-    $('btn-use').addEventListener('click', ()=>{ if(UI.selInv>=0) G.player.useItem(UI.selInv); });
-    $('btn-drop').addEventListener('click', ()=>{ if(UI.selInv>=0) G.player.dropItem(UI.selInv); });
+    $('btn-sort').addEventListener('click', ()=>{ UI.sortInventory(); });
     // equip cells -> unequip
     document.querySelectorAll('.eq-cell').forEach(c=>{
       c.addEventListener('click', ()=>{ G.player.unequip(c.dataset.slot); });
@@ -197,8 +196,6 @@ const UI = {
     });
     $('shop-close').addEventListener('click', ()=>{ $('shop').classList.add('hidden'); });
     $('depot-close').addEventListener('click', ()=>{ $('depot').classList.add('hidden'); });
-    $('btn-deposit').addEventListener('click', ()=>{ if(UI.selInv>=0) Depot.deposit(UI.selInv); else UI.toast('Select an item from your backpack first.'); });
-    $('btn-withdraw').addEventListener('click', ()=>{ if(UI._depotSel>=0) Depot.withdraw(UI._depotSel); });
     // confirm modal
     $('confirm-yes').addEventListener('click', ()=>{ $('confirm-modal').classList.add('hidden'); const cb=UI._confirmCb; UI._confirmCb=null; cb&&cb(); });
     $('confirm-no').addEventListener('click', ()=>{ $('confirm-modal').classList.add('hidden'); UI._confirmCb=null; });
@@ -659,10 +656,8 @@ const UI = {
         const it=ITEMS[s.id];
         count++;
         c.classList.add('r-'+it.rarity);
-        if(UI.selInv===i) c.classList.add('selected');
         c.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(s.id):esc(it.icon))+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
-        c.addEventListener('click', ()=>{ UI.selInv=i; UI.refreshInventory(); Audio.play('click'); });
-        c.addEventListener('dblclick', ()=>{ P.useItem(i); UI.selInv=-1; UI.refreshInventory(); });
+        c.addEventListener('dblclick', ()=>{ P.useItem(i); UI.refreshInventory(); });
         UI.attachDrag(c,{kind:'inv',idx:i},s);
       } else {
         c.classList.add('empty');
@@ -711,13 +706,20 @@ const UI = {
     });
     cell.addEventListener('pointermove', e=>{
       if(!Drag._candidate || Drag._started) return;
-      if(Math.hypot(e.clientX-Drag._downX, e.clientY-Drag._downY) < 6) return;
+      if(Math.hypot(e.clientX-Drag._downX, e.clientY-Drag._downY) < 12) return;
       Drag._started=true;
       const c=Drag._candidate;
       Drag.begin(e, c.src, c.item, c.split);
       Audio.play('click');
       const dz=$('drop-zone'); if(dz) dz.classList.remove('hidden');
     });
+    if(!cell._dragReleaseHooked){
+      cell._dragReleaseHooked=true;
+      const release=()=>{ if(!Drag._started){ Drag._candidate=null; } };
+      cell.addEventListener('pointerup', release);
+      cell.addEventListener('pointercancel', release);
+      cell.addEventListener('pointerleave', release);
+    }
   },
   hintDrop(){
     const dz=$('drop-zone'); if(!dz) return;
@@ -980,28 +982,23 @@ const UI = {
       if(s){
         const it=ITEMS[s.id];
         c.classList.add('r-'+it.rarity);
-        if(UI.selInv===i) c.classList.add('selected');
         c.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(s.id):esc(it.icon))+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
         UI.attachDrag(c,{kind:'inv',idx:i},s);
       } else c.classList.add('empty');
-      c.addEventListener('click', ()=>{ if(s){ UI.selInv=i; UI.refreshDepot(); } });
       c.addEventListener('mouseenter', e=>{ if(s) UI.showTooltip(e,s.id); });
       c.addEventListener('mousemove', e=>UI.moveTooltip(e));
       c.addEventListener('mouseleave', ()=>UI.hideTooltip());
       bp.appendChild(c);
     });
     const grid=$('depot-grid'); grid.innerHTML='';
-    UI._depotSel = UI._depotSel==null?-1:UI._depotSel;
     P.depot.forEach((s,i)=>{
       const c=el('div','inv-cell'); c.dataset.kind='depot'; c.dataset.idx=i;
       if(s){
         const it=ITEMS[s.id];
         c.classList.add('r-'+it.rarity);
-        if(UI._depotSel===i) c.classList.add('selected');
         c.innerHTML=(typeof spriteIcon!=='undefined'?spriteIcon(s.id):esc(it.icon))+(s.qty>1?'<span class="qty">'+s.qty+'</span>':'');
         UI.attachDrag(c,{kind:'depot',idx:i},s);
       } else c.classList.add('empty');
-      c.addEventListener('click', ()=>{ if(s){ UI._depotSel=i; UI.refreshDepot(); } });
       c.addEventListener('mouseenter', e=>{ if(s) UI.showTooltip(e,s.id); });
       c.addEventListener('mousemove', e=>UI.moveTooltip(e));
       c.addEventListener('mouseleave', ()=>UI.hideTooltip());

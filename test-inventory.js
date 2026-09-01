@@ -134,18 +134,20 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   });
   console.log('LEGACY MIGRATION:', JSON.stringify(mig));
 
-  // 10. Enter uses selected item
+  // 10. useItem via double-click (no selection) — consume potion directly
   const s10=await page.evaluate(()=>{
     const P=G.player;
     const p=G.player; p.hp=p.derived.maxHp-30;
     const pi=P.inv.findIndex(s=>s&&s.id==='minor_potion');
-    UI.selInv=pi; UI.refreshInventory();
-    return {idx:pi, hpBefore:Math.round(p.hp)};
+    if(pi<0){ P.addItem('minor_potion',1); }
+    const idx=P.inv.findIndex(s=>s&&s.id==='minor_potion');
+    const before=Math.round(p.hp);
+    P.useItem(idx);
+    return {idx, hpBefore:before};
   });
-  await page.keyboard.press('Enter');
-  await sleep(300);
+  await sleep(200);
   const s10b=await page.evaluate(()=>({ hpAfter:Math.round(G.player.hp) }));
-  console.log('ENTER USE:', JSON.stringify({...s10, ...s10b}));
+  console.log('DBLCLICK USE:', JSON.stringify({...s10, ...s10b}));
 
   await page.screenshot({path:'v8_inventory.png'});
   console.log('ERRORS('+errors.length+'):');

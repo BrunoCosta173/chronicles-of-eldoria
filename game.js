@@ -48,7 +48,6 @@ const Input = {
       else if(k==='k'){ UI.togglePanel('panel-skills'); }
       else if(k==='q'){ UI.togglePanel('panel-quests'); }
       else if(k==='m'){ UI.togglePanel('panel-map'); }
-      else if(k==='enter' && !$('panel-inventory').classList.contains('hidden') && UI.selInv>=0){ G.player.useItem(UI.selInv); UI.selInv=-1; UI.refreshInventory(); }
       else if(k==='f'){ Game.interact(); }
       else if(k==='tab'){ e.preventDefault(); Game.tabTarget(); }
       else if(k===' '){ Game.spaceAttack(); }
